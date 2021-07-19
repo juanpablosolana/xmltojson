@@ -23,7 +23,19 @@ app.get("/", (req, res) => {
           `https://cfdiestaus.herokuapp.com/${jsonCfdi.emisor.rfc}&&${jsonCfdi.receptor.rfc}&&${jsonCfdi.total}&&${jsonCfdi.timbreFiscal.uuid}`
         )
           .then((resp) => resp.json())
-          .then((data) =>  res.status(200).json(data));
+          .then((data) =>
+            res
+              .status(200)
+              .json(
+                `${jsonCfdi.timbreFiscal.uuid.toUpperCase()} | ${
+                  jsonCfdi.emisor.rfc
+                } | ${jsonCfdi.receptor.rfc} | ${jsonCfdi.total} | ${
+                  data["s:Envelope"]["s:Body"]["ConsultaResponse"][
+                    "ConsultaResult"
+                  ]["a:Estado"]["_text"]
+                }`
+              )
+          );
     })
     .catch((err) => {
       res.status(500).json(err);
