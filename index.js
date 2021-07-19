@@ -3,6 +3,7 @@ const app = express();
 const cors = require("cors");
 const fetch = require("node-fetch");
 const CfdiToJson = require("cfdi-to-json");
+const { response } = require("express");
 var jsonCfdi = null;
 
 app.use(cors());
@@ -17,8 +18,12 @@ app.get("/", (req, res) => {
     .then((data) => {
       jsonCfdi = CfdiToJson.parse({
         contentXML: `${data}`,
-      });
-      res.status(200).json(jsonCfdi);
+      })
+        fetch(
+          `https://cfdiestaus.herokuapp.com/${jsonCfdi.emisor.rfc}&&${jsonCfdi.receptor.rfc}&&${jsonCfdi.total}&&${jsonCfdi.timbreFiscal.uuid}`
+        )
+          .then((resp) => resp.json())
+          .then((data) =>  res.status(200).json(data));
     })
     .catch((err) => {
       res.status(500).json(err);
